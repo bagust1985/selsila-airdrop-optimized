@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "dev": "bun --hot src/index.ts",
-    "start": "bun run railway-start.ts",
+    "start": "bun run dist/index.js",
     "build": "bun build src/index.ts --outdir=dist --target=bun --minify --sourcemap",
     "railway:build": "bun install && bun run build"
   },

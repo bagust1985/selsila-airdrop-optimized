@@ -1,5 +1,10 @@
 [phases.setup]
-cmds = ["curl -fsSL https://bun.sh/install | bash", "export BUN_INSTALL=/opt/bun && export PATH=$BUN_INSTALL/bin:$PATH"]
+cmds = [
+  "apk add --no-cache unzip curl",
+  "curl -fsSL https://bun.sh/install | bash",
+  "export BUN_INSTALL=/opt/bun",
+  "export PATH=$BUN_INSTALL/bin:$PATH"
+]
 
 [phases.install]
 cmds = ["/opt/bun/bin/bun install"]
