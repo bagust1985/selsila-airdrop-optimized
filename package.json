@@ -5,8 +5,8 @@
   "scripts": {
     "dev": "bun --hot src/index.ts",
     "start": "bun run dist/index.js",
-    "build": "bun build src/index.ts --outdir=dist --target=bun --minify --sourcemap",
-    "railway:build": "bun install && bun run build"
+    "build": "bun build src/index.ts --outdir=dist --target=node --minify --sourcemap",
+    "postinstall": "bun run build"
   },
   "dependencies": {
     "elysia": "^1.1.16",

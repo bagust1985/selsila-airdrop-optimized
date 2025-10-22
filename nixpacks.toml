@@ -1,16 +1,20 @@
 [phases.setup]
 cmds = [
-  "apk add --no-cache unzip curl",
-  "curl -fsSL https://bun.sh/install | bash",
-  "export BUN_INSTALL=/opt/bun",
-  "export PATH=$BUN_INSTALL/bin:$PATH"
+    "apt-get update && apt-get install -y unzip curl",
+    "curl -fsSL https://bun.sh/install | bash",
+    "export BUN_INSTALL=/root/.bun",
+    "export PATH=$BUN_INALL/bin:$PATH"
 ]
 
 [phases.install]
-cmds = ["/opt/bun/bin/bun install"]
+cmds = ["/root/.bun/bin/bun install --frozen-lockfile"]
 
-[phases.build]
-cmds = ["/opt/bun/bin/bun run build"]
+[phases.build] 
+cmds = ["/root/.bun/bin/bun run build"]
 
 [start]
-cmd = "/opt/bun/bin/bun run start"
+cmd = "/root/.bun/bin/bun run start"
+
+[providers.railway]
+buildCommand = "/root/.bun/bin/bun install --frozen-lockfile && /root/.bun/bin/bun run build"
+startCommand = "/root/.bun/bin/bun run start"
