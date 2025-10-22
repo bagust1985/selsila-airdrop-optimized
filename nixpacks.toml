@@ -1,0 +1,11 @@
+[phases.setup]
+cmds = ["curl -fsSL https://bun.sh/install | bash", "export BUN_INSTALL=/opt/bun && export PATH=$BUN_INSTALL/bin:$PATH"]
+
+[phases.install]
+cmds = ["/opt/bun/bin/bun install"]
+
+[phases.build]
+cmds = ["/opt/bun/bin/bun run build"]
+
+[start]
+cmd = "/opt/bun/bin/bun run start"

@@ -4,13 +4,9 @@
   "type": "module",
   "scripts": {
     "dev": "bun --hot src/index.ts",
-    "start": "bun src/index.ts", 
+    "start": "bun run railway-start.ts",
     "build": "bun build src/index.ts --outdir=dist --target=bun --minify --sourcemap",
-    "db:migrate": "bun run src/core/database/migrate.ts",
-    "docker:dev:up": "docker-compose -f docker/docker-compose.optimized.yml up -d",
-    "docker:dev:down": "docker-compose -f docker/docker-compose.optimized.yml down",
-    "docker:dev:logs": "docker-compose -f docker/docker-compose.optimized.yml logs -f",
-    "dev:full": "bun run docker:dev:up && bun run dev"
+    "railway:build": "bun install && bun run build"
   },
   "dependencies": {
     "elysia": "^1.1.16",
