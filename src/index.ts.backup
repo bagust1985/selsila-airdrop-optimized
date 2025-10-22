@@ -1,0 +1,178 @@
+import { Elysia, t } from 'elysia'
+import { cors } from '@elysiajs/cors'
+import { swagger } from '@elysiajs/swagger'
+import { testConnection, sql } from './core/database/postgres'
+import { testRedisConnection, cache, redis } from './core/cache/redis'
+
+// Simple console logger
+const logger = {
+  info: (msg: string) => console.log(`[INFO] ${new Date().toISOString()}: ${msg}`),
+  error: (msg: string, error?: any) => console.error(`[ERROR] ${new Date().toISOString()}: ${msg}`, error),
+  warn: (msg: string) => console.warn(`[WARN] ${new Date().toISOString()}: ${msg}`)
+}
+
+// Initialize app
+const app = new Elysia()
+
+// Global middleware dengan database dan cache
+app
+  .use(cors())
+  .use(swagger({
+    documentation: {
+      info: {
+        title: 'Selsila Airdrop API',
+        version: '2.0.0',
+        description: 'Optimized Airdrop API with Database & Caching'
+      }
+    }
+  }))
+  .decorate('db', sql)
+  .decorate('cache', cache)
+  .onStart(async () => {
+    logger.info('🚀 Selsila Airdrop API Optimized Started!')
+    
+    // Test database connection
+    const dbConnected = await testConnection()
+    if (!dbConnected) {
+      logger.error('Database connection failed!')
+    }
+    
+    // Test Redis connection
+    const redisConnected = await testRedisConnection()
+    if (!redisConnected) {
+      logger.error('Redis connection failed!')
+    }
+  })
+  .onStop(async () => {
+    logger.info('🛑 Selsila Airdrop API Stopped')
+    await sql.end()
+    await redis.quit()
+  })
+
+// Enhanced health check dengan database & cache status
+app.get('/health', async () => {
+  const dbStatus = await testConnection()
+  const cacheStatus = await testRedisConnection()
+  
+  return {
+    success: true,
+    message: 'Selsila Airdrop API Optimized is running!',
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || 'development',
+    version: '2.0.0',
+    services: {
+      database: dbStatus ? 'connected' : 'disconnected',
+      cache: cacheStatus ? 'connected' : 'disconnected'
+    }
+  }
+}, {
+  detail: {
+    tags: ['System'],
+    summary: 'Health check with service status'
+  }
+})
+
+// Cached example endpoint
+app.get('/cached-data', async () => {
+  const cacheKey = 'cached_example_data'
+  
+  // Try to get from cache first
+  const cached = await cache.get(cacheKey)
+  if (cached) {
+    logger.info('Returning cached data')
+    return {
+      source: 'cache',
+      data: cached,
+      timestamp: new Date().toISOString()
+    }
+  }
+  
+  // If not in cache, get from database (simulated)
+  logger.info('Fetching fresh data from database')
+  const freshData = {
+    message: 'This is fresh data from database',
+    items: ['item1', 'item2', 'item3'],
+    count: 3
+  }
+  
+  // Store in cache for 5 minutes
+  await cache.set(cacheKey, freshData, 300)
+  
+  return {
+    source: 'database', 
+    data: freshData,
+    timestamp: new Date().toISOString()
+  }
+}, {
+  detail: {
+    tags: ['Cache'],
+    summary: 'Example of cached data endpoint'
+  }
+})
+
+// Keep existing endpoints...
+app.get('/', () => {
+  return {
+    message: 'Welcome to Selsila Airdrop Optimized API',
+    version: '2.0.0',
+    features: [
+      'High performance architecture',
+      'Advanced caching with Redis',
+      'Database connection pooling',
+      'Better error handling',
+      'Enhanced security'
+    ]
+  }
+})
+
+app.get('/test/:name', ({ params: { name } }) => {
+  return {
+    message: `Hello ${name}!`,
+    timestamp: new Date().toISOString()
+  }
+})
+
+// Error handling
+app.onError(({ code, error, set }) => {
+  logger.error(`Error ${code}:`, error)
+  
+  if (code === 'VALIDATION') {
+    set.status = 422
+    return {
+      success: false,
+      message: 'Validation error',
+      errors: error.all
+    }
+  }
+  
+  set.status = 500
+  return {
+    success: false,
+    message: 'Internal server error'
+  }
+})
+
+// Custom 404 handler
+app.all('*', ({ set }) => {
+  set.status = 404
+  return {
+    success: false,
+    message: 'Endpoint not found'
+  }
+})
+
+// Start server
+const port = process.env.PORT ? parseInt(process.env.PORT) : 3001
+
+app.listen({
+  port: port,
+  hostname: '0.0.0.0',    // <- HARUS '0.0.0.0'
+  reusePort: true         // <- TAMBAH INI
+}, () => {
+  logger.info(`✅ Server running on port ${port}`)
+  logger.info(`📚 API Documentation: http://localhost:${port}/swagger`)
+  logger.info(`🏥 Health Check: http://localhost:${port}/health`)
+  logger.info(`📊 Dashboard: http://localhost:${port}/dashboard/stats`)
+})
+
+export type App = typeof app

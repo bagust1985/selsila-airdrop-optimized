@@ -1,0 +1,37 @@
+{
+  "name": "selsila-airdrop-optimized",
+  "module": "src/index.ts",
+  "type": "module",
+  "scripts": {
+    "dev": "bun --hot src/index.ts",
+    "start": "bun src/index.ts", 
+    "build": "bun build src/index.ts --outdir=dist --target=bun --minify --sourcemap",
+    "db:migrate": "bun run src/core/database/migrate.ts",
+    "docker:dev:up": "docker-compose -f docker/docker-compose.optimized.yml up -d",
+    "docker:dev:down": "docker-compose -f docker/docker-compose.optimized.yml down",
+    "docker:dev:logs": "docker-compose -f docker/docker-compose.optimized.yml logs -f",
+    "dev:full": "bun run docker:dev:up && bun run dev"
+  },
+  "dependencies": {
+    "elysia": "^1.1.16",
+    "@elysiajs/bearer": "^1.1.2",
+    "@elysiajs/cors": "^1.1.1",
+    "@elysiajs/swagger": "^1.1.3",
+    "postgres": "^3.4.4",
+    "redis": "^4.6.13",
+    "@solana/web3.js": "^1.95.2",
+    "@solana/spl-token": "^0.4.13",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.2",
+    "zod": "^3.23.8",
+    "nanoid": "^5.0.7",
+    "pino": "^8.19.0",
+    "pino-pretty": "^10.3.1"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/jsonwebtoken": "^9.0.7",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/node": "^20.8.0"
+  }
+}
